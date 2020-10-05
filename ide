@@ -9,7 +9,7 @@ SRP_NAME=$(basename "$0")
 REQS=(tmux vim)
 
 #------------------------------------------------------------------------------
-# Check if all required commands exit
+# Check if all required commands exist
 #------------------------------------------------------------------------------
 has_reqs=true
 for req in "${REQS[@]}"; do
@@ -22,7 +22,7 @@ if [[ ${has_reqs} == false ]]; then
 fi
 
 #------------------------------------------------------------------------------
-# Varidate arguments
+# Validate arguments
 #------------------------------------------------------------------------------
 if (( $# > 1 )); then
   echo "usage: ${SRP_NAME} [directory]" 1>&2
