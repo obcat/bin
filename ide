@@ -1,0 +1,51 @@
+#!/bin/zsh
+#
+# Create IDE.
+
+#------------------------------------------------------------------------------
+# Constants
+#------------------------------------------------------------------------------
+SRP_NAME=$(basename "$0")
+REQS=(tmux vim)
+
+#------------------------------------------------------------------------------
+# Check if all required commands exit
+#------------------------------------------------------------------------------
+has_reqs=true
+for req in "${REQS[@]}"; do
+  type "${req}" &>/dev/null || has_reqs=false && break
+done
+
+if [[ ${has_reqs} == false ]]; then
+  echo "${SRP_NAME}: required: ${REQS[*]}" 1>&2
+  exit 1
+fi
+
+#------------------------------------------------------------------------------
+# Varidate arguments
+#------------------------------------------------------------------------------
+if (( $# > 1 )); then
+  echo "usage: ${SRP_NAME} [directory]" 1>&2
+  exit 1
+fi
+
+DIR=.
+[[ -n $1 ]] && DIR=$1
+
+if [[ ! -d ${DIR} ]]; then
+  echo "${SRP_NAME}: ${DIR}: No such directory" 1>&2
+  exit 1
+fi
+
+#------------------------------------------------------------------------------
+# Main scripts
+#------------------------------------------------------------------------------
+if [[ -n ${TMUX} ]]; then
+  cd "${DIR}"
+  tmux split-window -v -d -l 16 -c '#{pane_current_path}'
+  vim .
+else
+  tmux new-session -d
+  tmux send-keys "${SRP_NAME} ${DIR}" Enter
+  tmux attach-session
+fi
