@@ -40,12 +40,17 @@ fi
 #------------------------------------------------------------------------------
 # Main scripts
 #------------------------------------------------------------------------------
-if [[ -n ${TMUX} ]]; then
-  cd "${DIR}"
-  tmux split-window -v -d -l 16 -c '#{pane_current_path}'
-  vim .
-else
+if [[ -z ${TMUX} ]]; then
   tmux new-session -d
   tmux send-keys "${SRP_NAME} ${DIR}" Enter
   tmux attach-session
 fi
+
+if (( $(tmux list-panes | wc -l) >= 2 )); then
+  echo "${SRP_NAME}: Current window is already splited" 1>&2
+  exit 1
+fi
+
+tmux send-keys "cd ${DIR}"                  Enter
+tmux send-keys "tmux split-window -d -l 16" Enter C-l
+tmux send-keys 'vim .'                      Enter
